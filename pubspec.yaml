@@ -63,7 +63,7 @@ flutter:
         pluginClass: DialogflowGrpcPlugin
       web:
         pluginClass: DialogflowGrpcPlugin
-        fileName: dialogflow_grpc_web.dart
+        fileName: web/dialogflow_grpc_web.dart
   # To add assets to your plugin package, add an assets section, like this:
   #assets:
   #  - assets/
