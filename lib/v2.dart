@@ -15,6 +15,7 @@
 import 'dart:async';
 
 import 'package:grpc/grpc.dart';
+import 'package:grpc/grpc_or_grpcweb.dart';
 import 'package:uuid/uuid.dart';
 
 import 'dialogflow_auth.dart';
@@ -31,7 +32,7 @@ class DialogflowGrpcV2 {
   final CallOptions _options;
 
   // [ClientChannel] which is used for Dialogflow
-  final ClientChannel _channel = ClientChannel('dialogflow.googleapis.com');
+  final ClientChannel _channel = GrpcOrGrpcWebClientChannel.grpc('dialogflow.googleapis.com');
 
   late SessionsClient client;
 
