@@ -33,7 +33,7 @@ class DialogflowGrpcV2Beta1 {
   final CallOptions _options;
 
   // [ClientChannel] which is used for Dialogflow
-  final ClientChannel _channel = GrpcOrGrpcWebClientChannel.grpc('dialogflow.googleapis.com');
+  final GrpcOrGrpcWebClientChannel _channel = GrpcOrGrpcWebClientChannel.grpc('dialogflow.googleapis.com');
 
   late SessionsClient client;
 
