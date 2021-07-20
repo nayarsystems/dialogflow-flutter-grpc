@@ -32,7 +32,12 @@ class DialogflowGrpcV2 {
   final CallOptions _options;
 
   // [ClientChannel] which is used for Dialogflow
-  final GrpcOrGrpcWebClientChannel _channel = GrpcOrGrpcWebClientChannel.grpc('dialogflow.googleapis.com');
+  final GrpcOrGrpcWebClientChannel _channel =
+      GrpcOrGrpcWebClientChannel.toSingleEndpoint(
+    host: 'dialogflow.googleapis.com',
+    port: 443,
+    transportSecure: true,
+  );
 
   late SessionsClient client;
 
