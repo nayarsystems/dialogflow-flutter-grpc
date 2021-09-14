@@ -14,6 +14,7 @@
 
 import 'dart:async';
 
+import 'package:dialogflow_grpc/types/v2beta1/output_config.dart';
 import 'package:grpc/grpc.dart';
 import 'package:grpc/grpc_or_grpcweb.dart';
 import 'package:uuid/uuid.dart';
@@ -62,8 +63,8 @@ class DialogflowGrpcV2Beta1 {
   /// DialogflowGrpcV2Beta1 dialogflow = DialogflowGrpcV2Beta1.viaServiceAccount(serviceAccount);
   /// ```
   factory DialogflowGrpcV2Beta1.viaServiceAccount(ServiceAccount account) {
-    var projectId = account.projectId;
-    var uuid = Uuid().v4();
+    final projectId = account.projectId;
+    final uuid = const Uuid().v4();
     DialogflowAuth.session = 'projects/$projectId/agent/sessions/$uuid';
 
     return DialogflowGrpcV2Beta1._(account.callOptions);
@@ -78,7 +79,11 @@ class DialogflowGrpcV2Beta1 {
   /// var data = await dialogflow.detectIntent(text, 'en-US');
   /// print(data.queryResult.fulfillmentText);
   /// ```
-  Future<DetectIntentResponse> detectIntent(String text, String lang) {
+  Future<DetectIntentResponse> detectIntent(
+    String text,
+    String lang, {
+    OutputConfigV2beta1? outputAudioConfig,
+  }) {
     final inputText = TextInput()
       ..text = text
       ..languageCode = lang;
@@ -87,7 +92,8 @@ class DialogflowGrpcV2Beta1 {
 
     final request = DetectIntentRequest()
       ..queryInput = queryInput
-      ..session = DialogflowAuth.session;
+      ..session = DialogflowAuth.session
+      ..outputAudioConfig = outputAudioConfig?.cast() ?? OutputAudioConfig();
 
     return client.detectIntent(request);
   }
@@ -99,8 +105,12 @@ class DialogflowGrpcV2Beta1 {
   /// var data = await dialogflow.detectEventIntent('WELCOME', 'en-US');
   /// print(data.queryResult.fulfillmentText);
   /// ```
-  Future<DetectIntentResponse> detectEventIntent(String eventName, String lang,
-      {Struct? parameters}) {
+  Future<DetectIntentResponse> detectEventIntent(
+    String eventName,
+    String lang, {
+    Struct? parameters,
+    OutputConfigV2beta1? outputAudioConfig,
+  }) {
     final eventInput = EventInput(
       name: eventName,
       languageCode: lang,
@@ -110,7 +120,10 @@ class DialogflowGrpcV2Beta1 {
     final queryInput = QueryInput(event: eventInput);
 
     final request = DetectIntentRequest(
-        queryInput: queryInput, session: DialogflowAuth.session);
+      queryInput: queryInput,
+      session: DialogflowAuth.session,
+      outputAudioConfig: outputAudioConfig?.cast() ?? OutputAudioConfig(),
+    );
 
     return client.detectIntent(request);
   }
@@ -144,7 +157,10 @@ class DialogflowGrpcV2Beta1 {
   /// });
   /// ```
   Stream<StreamingDetectIntentResponse> streamingDetectIntent(
-      InputConfigV2beta1 config, Stream<List<int>> audioStream) {
+    InputConfigV2beta1 config,
+    Stream<List<int>> audioStream, {
+    OutputConfigV2beta1? outputAudioConfig,
+  }) {
     // Create the stream, which later transmits the necessary
     // data to the Google Api.
     final request = StreamController<StreamingDetectIntentRequest>();
@@ -152,13 +168,14 @@ class DialogflowGrpcV2Beta1 {
 
     //print(DialogflowAuth.session);
 
-    QueryInput queryInput = QueryInput()..audioConfig = config.cast();
+    final queryInput = QueryInput()..audioConfig = config.cast();
 
-    print(queryInput);
-
-    request.add(StreamingDetectIntentRequest()
-      ..queryInput = queryInput
-      ..session = DialogflowAuth.session);
+    request.add(
+      StreamingDetectIntentRequest()
+        ..queryInput = queryInput
+        ..session = DialogflowAuth.session
+        ..outputAudioConfig = outputAudioConfig?.cast() ?? OutputAudioConfig(),
+    );
 
     // Send the request first
     // Afterwards start streaming the audio
